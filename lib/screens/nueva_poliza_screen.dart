@@ -16,18 +16,23 @@ class _NuevaPolizaScreenState extends State<NuevaPolizaScreen> {
 
   void agregarPoliza() async {
     if (_formKey.currentState!.validate()) {
-      final nuevaPoliza = await apiService.createPoliza({
-        "Auto": autoController.text,
-        "Costo": double.parse(costoController.text),
-        "FechaVigencia": fechaVigenciaController.text,
-        "IdCliente": int.parse(idClienteController.text),
-      });
+      try {
+        final nuevaPoliza = await apiService.createPoliza({
+          "Auto": autoController.text,
+          "Costo": double.parse(costoController.text),
+          "FechaVigencia": fechaVigenciaController.text,
+          "IdCliente": int.parse(idClienteController.text),
+        });
 
-      if (nuevaPoliza != null) {
-        Navigator.pop(context, nuevaPoliza);
-      } else {
+        if (nuevaPoliza != null) {
+          Navigator.pop(context, nuevaPoliza);
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error al agregar póliza")),
+          SnackBar(
+            content: Text("Error al agregar póliza: ${e.toString()}"), // Muestra el mensaje de error
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }

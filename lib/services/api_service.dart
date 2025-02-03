@@ -81,9 +81,9 @@ class ApiService {
     );
 
     if (response.statusCode == 201) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body); // Póliza creada exitosamente
     } else {
-      throw Exception("Error al crear póliza");
+      throw response.body; // Lanza el mensaje de error como texto
     }
   }
 
