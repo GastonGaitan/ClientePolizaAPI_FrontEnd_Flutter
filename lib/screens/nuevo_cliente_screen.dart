@@ -15,7 +15,8 @@ class _NuevoClienteScreenState extends State<NuevoClienteScreen> {
   final TextEditingController fechaNacimientoController = TextEditingController();
 
   void agregarCliente() async {
-    if (_formKey.currentState!.validate()) {
+  if (_formKey.currentState!.validate()) {
+    try {
       final nuevoCliente = await apiService.createCliente({
         "nombre": nombreController.text,
         "apellido": apellidoController.text,
@@ -24,14 +25,19 @@ class _NuevoClienteScreenState extends State<NuevoClienteScreen> {
       });
 
       if (nuevoCliente != null) {
-        Navigator.pop(context, nuevoCliente); // Devuelve el cliente agregado a la pantalla anterior
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error al agregar cliente")),
-        );
+        Navigator.pop(context, nuevoCliente);
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()), // Muestra el mensaje de error de la API
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
