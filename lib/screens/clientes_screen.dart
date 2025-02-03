@@ -10,6 +10,7 @@ class ClientesScreen extends StatefulWidget {
 
 class _ClientesScreenState extends State<ClientesScreen> {
   final ApiService apiService = ApiService();
+  
   List<dynamic> clientes = [];
 
   @override
@@ -41,6 +42,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
     if (nuevoCliente != null) {
       setState(() {
         clientes.add(nuevoCliente);
+        
       });
     }
   }
@@ -115,7 +117,13 @@ class _ClientesScreenState extends State<ClientesScreen> {
                         ),
                         IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => eliminarCliente(cliente['id']),
+                          onPressed: () {
+                            eliminarCliente(cliente['id']);
+                            setState(() {
+                              clientes.remove(cliente);
+                            });
+                          },
+                          
                         ),
                       ],
                     ),
