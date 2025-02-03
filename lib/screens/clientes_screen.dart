@@ -8,7 +8,7 @@ class ClientesScreen extends StatefulWidget {
 
 class _ClientesScreenState extends State<ClientesScreen> {
   final ApiService apiService = ApiService();
-  late Future<List<dynamic>> clientes;
+  List<dynamic> clientes = []; // Cambiado de Future a List
 
   @override
   void initState() {
@@ -16,16 +16,19 @@ class _ClientesScreenState extends State<ClientesScreen> {
     cargarClientes();
   }
 
-  void cargarClientes() {
+  void cargarClientes() async {
+    final datos = await apiService.getClientes();
     setState(() {
-      clientes = apiService.getClientes();
+      clientes = datos;
     });
   }
 
   void eliminarCliente(int id) async {
     try {
       await apiService.deleteCliente(id);
-      cargarClientes(); // Recargar lista después de eliminar
+      setState(() {
+        clientes.removeWhere((cliente) => cliente['id'] == id);
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Cliente eliminado correctamente")),
       );
@@ -40,23 +43,17 @@ class _ClientesScreenState extends State<ClientesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Clientes")),
-      body: FutureBuilder<List<dynamic>>(
-        future: clientes,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
+      body: clientes.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: clientes.length,
               itemBuilder: (context, index) {
-                final cliente = snapshot.data![index];
+                final cliente = clientes[index];
                 return Card(
                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   elevation: 4,
                   child: ListTile(
-                    leading: Icon(Icons.person, size: 40, color: Colors.blue), // Icono de persona
+                    leading: Icon(Icons.person, size: 40, color: Colors.blue),
                     title: Text(
                       "${cliente['nombre']} ${cliente['apellido']}",
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -71,16 +68,18 @@ class _ClientesScreenState extends State<ClientesScreen> {
                     ),
                     trailing: IconButton(
                       icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => eliminarCliente(cliente['id']),
+                      onPressed: () {
+                          eliminarCliente(cliente['id']);
+                          setState(() {
+                            clientes.remove(cliente);
+                          });
+                      } ,
                     ),
                     contentPadding: EdgeInsets.all(16),
                   ),
                 );
               },
-            );
-          }
-        },
-      ),
+            ),
     );
   }
 }
