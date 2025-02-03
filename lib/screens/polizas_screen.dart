@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'nueva_poliza_screen.dart';
+import 'editar_poliza_screen.dart';
 
 class PolizasScreen extends StatefulWidget {
   @override
@@ -9,10 +10,8 @@ class PolizasScreen extends StatefulWidget {
 
 class _PolizasScreenState extends State<PolizasScreen> {
   final ApiService apiService = ApiService();
-
   List<dynamic> polizas = [];
-  
-  bool isLoading = true; // Nuevo estado para manejar la carga
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -25,11 +24,11 @@ class _PolizasScreenState extends State<PolizasScreen> {
       final datos = await apiService.getPolizas();
       setState(() {
         polizas = datos;
-        isLoading = false; // Carga completada
+        isLoading = false;
       });
     } catch (e) {
       setState(() {
-        isLoading = false; // Carga fallida
+        isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error al obtener las pólizas")),
@@ -38,13 +37,13 @@ class _PolizasScreenState extends State<PolizasScreen> {
   }
 
   void eliminarPoliza(int id) async {
-      await apiService.deletePoliza(id);
-      setState(() {
-        polizas.removeWhere((poliza) => poliza['id'] == id); // ✅ Usa el ID de la póliza correctamente
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Póliza eliminada correctamente"), backgroundColor: Colors.green),
-      );
+    await apiService.deletePoliza(id);
+    setState(() {
+      polizas.removeWhere((poliza) => poliza['id'] == id);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Póliza eliminada correctamente"), backgroundColor: Colors.green),
+    );
   }
 
   void irANuevaPolizaScreen() async {
@@ -59,6 +58,20 @@ class _PolizasScreenState extends State<PolizasScreen> {
       });
     }
   }
+
+  void irAEditarPolizaScreen(Map<String, dynamic> poliza) async {
+  final polizaActualizada = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditarPolizaScreen(poliza: poliza),
+    ),
+  );
+
+  if (polizaActualizada != null) {
+    cargarPolizas(); // 🔄 Recargar la lista completa después de editar
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +94,7 @@ class _PolizasScreenState extends State<PolizasScreen> {
         ],
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator()) // Solo se muestra mientras carga
+          ? Center(child: CircularProgressIndicator())
           : polizas.isEmpty
               ? Center(
                   child: Text(
@@ -99,30 +112,31 @@ class _PolizasScreenState extends State<PolizasScreen> {
                       child: ListTile(
                         leading: Icon(Icons.policy, size: 40, color: Colors.blue),
                         title: Text(
-                          "Poliza: ${poliza['id']}",
+                          "Póliza: ${poliza['id']}",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Auto: ${poliza['auto'] ?? 'Desconocido'}"), // ✅ "auto" en minúscula
+                            Text("Auto: ${poliza['auto'] ?? 'Desconocido'}"),
                             Text("Costo: \$${poliza['costo'] ?? '0.00'}"),
                             Text("Fecha de Vigencia: ${poliza['fechaVigencia'] ?? 'No disponible'}"),
                             Text("Cliente ID: ${poliza['idCliente'] ?? '-'}"),
-
                           ],
                         ),
-                        trailing: IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () { 
-                          eliminarPoliza(poliza['id']);
-                          setState(() {
-                              polizas.remove(poliza);
-                            });
-                        }, 
-
-                      ),
-
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit, color: Colors.green),
+                              onPressed: () => irAEditarPolizaScreen(poliza),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => eliminarPoliza(poliza['id']),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
