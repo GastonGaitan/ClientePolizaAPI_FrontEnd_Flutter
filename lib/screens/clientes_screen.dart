@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import 'nuevo_cliente_screen.dart'; // Importa la nueva pantalla
+import 'nuevo_cliente_screen.dart';
+import 'editar_cliente_screen.dart'; // Nueva pantalla para editar cliente
 
 class ClientesScreen extends StatefulWidget {
   @override
@@ -39,7 +40,25 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
     if (nuevoCliente != null) {
       setState(() {
-        clientes.add(nuevoCliente); // Agrega el nuevo cliente a la lista
+        clientes.add(nuevoCliente);
+      });
+    }
+  }
+
+  void irAEditarClienteScreen(Map<String, dynamic> cliente) async {
+    final clienteActualizado = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditarClienteScreen(cliente: cliente),
+      ),
+    );
+
+    if (clienteActualizado != null) {
+      setState(() {
+        int index = clientes.indexWhere((c) => c['id'] == clienteActualizado['id']);
+        if (index != -1) {
+          clientes[index] = clienteActualizado; // Actualiza la lista con los nuevos datos
+        }
       });
     }
   }
@@ -51,11 +70,11 @@ class _ClientesScreenState extends State<ClientesScreen> {
         title: Text("Clientes"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16), // Agrega espacio a la derecha
+            padding: EdgeInsets.only(right: 16),
             child: OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.blue, // Color del texto e icono
-                side: BorderSide(color: Colors.blue), // Borde azul
+                foregroundColor: Colors.blue,
+                side: BorderSide(color: Colors.blue),
               ),
               icon: Icon(Icons.add, color: Colors.blue),
               label: Text("Agregar"),
@@ -87,14 +106,18 @@ class _ClientesScreenState extends State<ClientesScreen> {
                         Text("Fecha de Nacimiento: ${cliente['fechaDeNacimiento']}"),
                       ],
                     ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        eliminarCliente(cliente['id']);
-                        setState(() {
-                          clientes.remove(cliente);
-                        });
-                      },
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit, color: Colors.green),
+                          onPressed: () => irAEditarClienteScreen(cliente),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => eliminarCliente(cliente['id']),
+                        ),
+                      ],
                     ),
                     contentPadding: EdgeInsets.all(16),
                   ),
