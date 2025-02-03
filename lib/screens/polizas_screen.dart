@@ -133,7 +133,12 @@ class _PolizasScreenState extends State<PolizasScreen> {
                             ),
                             IconButton(
                               icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => eliminarPoliza(poliza['id']),
+                              onPressed: () {
+                                eliminarPoliza(poliza['id']);
+                                setState(() {
+                                  polizas.remove(poliza);
+                                });
+                              } 
                             ),
                           ],
                         ),
