@@ -9,7 +9,9 @@ class PolizasScreen extends StatefulWidget {
 
 class _PolizasScreenState extends State<PolizasScreen> {
   final ApiService apiService = ApiService();
+
   List<dynamic> polizas = [];
+  
   bool isLoading = true; // Nuevo estado para manejar la carga
 
   @override
