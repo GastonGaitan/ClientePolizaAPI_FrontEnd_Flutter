@@ -47,7 +47,23 @@ class _ClientesScreenState extends State<ClientesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Clientes")),
+      appBar: AppBar(
+        title: Text("Clientes"),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 16), // Agrega espacio a la derecha
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.blue, // Color del texto e icono
+                side: BorderSide(color: Colors.blue), // Borde azul
+              ),
+              icon: Icon(Icons.add, color: Colors.blue),
+              label: Text("Agregar"),
+              onPressed: irANuevoClienteScreen,
+            ),
+          ),
+        ],
+      ),
       body: clientes.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -85,10 +101,6 @@ class _ClientesScreenState extends State<ClientesScreen> {
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: irANuevoClienteScreen, // Abre la pantalla para agregar cliente
-      ),
     );
   }
 }
