@@ -24,19 +24,10 @@ class _ClientesScreenState extends State<ClientesScreen> {
   }
 
   void eliminarCliente(int id) async {
-    try {
       await apiService.deleteCliente(id);
       setState(() {
         clientes.removeWhere((cliente) => cliente['id'] == id);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Cliente eliminado correctamente")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error al eliminar cliente: $e")),
-      );
-    }
   }
 
   @override
