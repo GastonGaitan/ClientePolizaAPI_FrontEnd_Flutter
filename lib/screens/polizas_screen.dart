@@ -38,7 +38,6 @@ class _PolizasScreenState extends State<PolizasScreen> {
   }
 
   void eliminarPoliza(int id) async {
-    try {
       await apiService.deletePoliza(id);
       setState(() {
         polizas.removeWhere((poliza) => poliza['id'] == id); // ✅ Usa el ID de la póliza correctamente
@@ -46,11 +45,6 @@ class _PolizasScreenState extends State<PolizasScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Póliza eliminada correctamente"), backgroundColor: Colors.green),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error al eliminar la póliza"), backgroundColor: Colors.red),
-      );
-    }
   }
 
   void irANuevaPolizaScreen() async {
@@ -72,9 +66,17 @@ class _PolizasScreenState extends State<PolizasScreen> {
       appBar: AppBar(
         title: Text("Pólizas"),
         actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: irANuevaPolizaScreen,
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.blue,
+                side: BorderSide(color: Colors.blue),
+              ),
+              icon: Icon(Icons.add, color: Colors.blue),
+              label: Text("Agregar"),
+              onPressed: irANuevaPolizaScreen,
+            ),
           ),
         ],
       ),
