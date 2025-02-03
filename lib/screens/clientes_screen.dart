@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'nuevo_cliente_screen.dart'; // Importa la nueva pantalla
 
 class ClientesScreen extends StatefulWidget {
   @override
@@ -8,7 +9,7 @@ class ClientesScreen extends StatefulWidget {
 
 class _ClientesScreenState extends State<ClientesScreen> {
   final ApiService apiService = ApiService();
-  List<dynamic> clientes = []; // Cambiado de Future a List
+  List<dynamic> clientes = [];
 
   @override
   void initState() {
@@ -24,10 +25,23 @@ class _ClientesScreenState extends State<ClientesScreen> {
   }
 
   void eliminarCliente(int id) async {
-      await apiService.deleteCliente(id);
+    await apiService.deleteCliente(id);
+    setState(() {
+      clientes.removeWhere((cliente) => cliente['id'] == id);
+    });
+  }
+
+  void irANuevoClienteScreen() async {
+    final nuevoCliente = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NuevoClienteScreen()),
+    );
+
+    if (nuevoCliente != null) {
       setState(() {
-        clientes.removeWhere((cliente) => cliente['id'] == id);
+        clientes.add(nuevoCliente); // Agrega el nuevo cliente a la lista
       });
+    }
   }
 
   @override
@@ -60,17 +74,21 @@ class _ClientesScreenState extends State<ClientesScreen> {
                     trailing: IconButton(
                       icon: Icon(Icons.delete, color: Colors.red),
                       onPressed: () {
-                          eliminarCliente(cliente['id']);
-                          setState(() {
-                            clientes.remove(cliente);
-                          });
-                      } ,
+                        eliminarCliente(cliente['id']);
+                        setState(() {
+                          clientes.remove(cliente);
+                        });
+                      },
                     ),
                     contentPadding: EdgeInsets.all(16),
                   ),
                 );
               },
             ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: irANuevoClienteScreen, // Abre la pantalla para agregar cliente
+      ),
     );
   }
 }

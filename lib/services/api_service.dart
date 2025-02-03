@@ -25,16 +25,20 @@ class ApiService {
   }
 
   // Crear un cliente
-  Future<void> createCliente(Map<String, dynamic> data) async {
+  Future<dynamic> createCliente(Map<String, dynamic> clienteData) async {
     final response = await http.post(
       Uri.parse('$baseUrl/Cliente'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(clienteData),
     );
-    if (response.statusCode != 201) {
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body); // Devuelve el cliente creado
+    } else {
       throw Exception("Error al crear cliente");
     }
   }
+
 
   // Actualizar un cliente
   Future<void> updateCliente(int id, Map<String, dynamic> data) async {
